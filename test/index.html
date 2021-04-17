@@ -12,17 +12,19 @@
     <button id="btn">fetch发送请求</button>
     <button id="btn2">axios发送请求</button>
     <button id="btn3">xhr发送请求</button>
+    <button id="btn4">清除缓存</button>
     <script src="/index.js"></script>
     <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
-        console.log('dsfs')
         window.onload = function () {
             const btn = document.querySelector('#btn')
             const btn2 = document.querySelector('#btn2')
             const btn3 = document.querySelector('#btn3')
+            const btn4 = document.querySelector('#btn4')
             btn.addEventListener('click', fetchHandler)
             btn2.addEventListener('click', axiosHandler)
             btn3.addEventListener('click', xhrHandler)
+            btn4.addEventListener('click', clearAllHandler)
         }
         function httpGet(url) {
             return new Promise((resolve, reject) => {
@@ -58,6 +60,9 @@
             requestCache(httpGet, '/test/user.json').then(res => {
                 console.log(res)
             })
+        }
+        function clearAllHandler() {
+            clearAll()
         }
     </script>
 </body>

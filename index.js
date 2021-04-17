@@ -49,9 +49,13 @@ function requestCache(request, ...args) {
 function getCatchObj() {
     return cacheObj
 }
-function clear(url) {
-    if (cacheObj[url]) delete cacheObj[url]
-    return cacheObj;
+function clear(urls) {
+    if (typeof urls === 'string') urls = [urls]
+    if (Array.isArray(urls)) {
+        urls.forEach(url => {
+            if (cacheObj[url]) delete cacheObj[url]
+        })
+    }
 }
 function clearAll() {
     cacheObj = {}
