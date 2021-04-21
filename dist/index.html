@@ -1,20 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-
-<body>
-    <button id="btn">fetch发送请求</button>
+    <!doctype html>
+    <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <title>Rollup Bundle</title>
+        
+      </head>
+      <body>
+      <button id="btn">fetch发送请求</button>
     <button id="btn2">axios发送请求</button>
     <button id="btn3">xhr发送请求</button>
     <button id="btn4">清除缓存</button>
-    <script src="/request-cacher/index.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+        <script src="/request-cacher/dist/request-cacher.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
         window.onload = function () {
             const btn = document.querySelector('#btn')
@@ -26,6 +24,7 @@
             btn3.addEventListener('click', xhrHandler)
             btn4.addEventListener('click', clearAllHandler)
         }
+        const {requestCache,clearAll} = window.requestCacher
         function httpGet(url) {
             return new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest()
@@ -47,17 +46,17 @@
             })
         }
         function fetchHandler() {
-            requestCache(fetch, '/test/user.json').then(res => {
+            requestCache(fetch, '/request-cacher/dist/user.json').then(res => {
                 console.log(res)
             }).catch((err) => console.log(err))
         }
         function axiosHandler() {
-            requestCache(axios, '/test/user.json').then(res => {
+            requestCache(axios, '/request-cacher/dist/user.json').then(res => {
                 console.log(res)
             })
         }
         function xhrHandler() {
-            requestCache(httpGet, '/test/user.json').then(res => {
+            requestCache(httpGet, '/request-cacher/dist/user.json').then(res => {
                 console.log(res)
             })
         }
@@ -65,6 +64,5 @@
             clearAll()
         }
     </script>
-</body>
-
-</html>
+      </body>
+    </html>
