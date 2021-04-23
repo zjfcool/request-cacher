@@ -1,16 +1,30 @@
 {
   "name": "request-cacher",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "lib/request-cacher.js",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zjfcool/request-cacher.git"
+  },
+  "homepage": "https://github.com/zjfcool/request-cacher",
   "scripts": {
     "build": "rollup -c"
   },
-  "keywords": [],
+  "keywords": [
+    "request-cacher",
+    "http",
+    "axios",
+    "fetch",
+    "cache",
+    "performance"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@rollup/plugin-html": "^0.2.3",
     "rollup": "^2.45.2"
   }
 }

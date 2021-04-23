@@ -1,83 +1,108 @@
 function getType(a) {
-  return Object.prototype.toString.call(a).slice(8, -1).toLowerCase();
+    return Object.prototype.toString.call(a).slice(8, -1).toLowerCase();
 }
 function isFunction(a) {
-  return getType(a) === "function";
+    return getType(a) === "function";
 }
 function isObject(a) {
-  return getType(a) === "object";
+    return getType(a) === "object";
+}
+function isNumber(a) {
+    return getType(a) === 'number';
+}
+function isString(a) {
+    return getType(a) === 'string';
 }
 function hashCode(str) {
-  var hash = 0,
-    i,
-    chr,
-    len;
-  if (str.length === 0) return hash;
-  for (i = 0, len = str.length; i < len; i++) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
+    var hash = 0,
+        i,
+        chr,
+        len;
+    if (str.length === 0) return hash;
+    for (i = 0, len = str.length; i < len; i++) {
+        chr = str.charCodeAt(i);
+        hash = (hash << 5) - hash + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
 }
 let cacheObj = {};
 function requestCache(request, ...args) {
-  return new Promise(async (resolve, reject) => {
-    let url = "";
-    if (typeof args[0] === "string") {
-      url = args[0];
-    } else if (isObject(args[0])) {
-      url = args[0] && args[0].url;
-    }
-    if (url === "") return console.error("not found request url");
-    if (!cacheObj[url]) {
-      cacheObj[url] = {
-        data: null,
-        status: 1,
-      };
-    }
-    if (cacheObj[url].status === 1 && cacheObj[url].data)
-      return resolve(cacheObj[url]);
-    if (isFunction(request)) {
-      const result = request(...args);
-      if (result instanceof Promise) {
-        result
-          .then(async (res) => {
-            cacheObj[url].status = 1;
-            if (res.json && isFunction(res.json)) {
-              cacheObj[url].data = await res.json();
-              resolve(cacheObj[url]);
-            } else {
-              cacheObj[url].data = res.data || res;
-              resolve(cacheObj[url]);
+    return new Promise(async (resolve, reject) => {
+        let url = "";
+        if (typeof args[0] === "string") {
+            url = args[0];
+        } else if (isObject(args[0])) {
+            url = args[0] && args[0].url;
+        }
+        if (url === "") return console.error("not found request url");
+        let oid = url
+        try {
+            oid = hashCode(JSON.stringify(args.map((arg, index) => ({ [index]: arg }))))
+        } catch (err) {
+            console.error(err)
+        }
+        if (!cacheObj[oid]) {
+            cacheObj[oid] = {
+                data: null,
+                oid: oid,
+                options: args,
+                status: 1,
+            };
+        }
+        if (cacheObj[oid].status === 1 && cacheObj[oid].data)
+            return resolve(cacheObj[oid]);
+        if (isFunction(request)) {
+            const result = request(...args);
+            if (result instanceof Promise) {
+                result
+                    .then((res) => {
+                        cacheObj[oid].status = 1;
+                        if (res.json && isFunction(res.json)) {
+                            res.json().then(data => {
+                                cacheObj[oid].data = data
+                                resolve(cacheObj[oid]);
+                            })
+                        } else {
+                            cacheObj[oid].data = res.data || res;
+                            resolve(cacheObj[oid]);
+                        }
+                    })
+                    .catch((err) => {
+                        cacheObj[oid].status = 0;
+                        reject(err);
+                    });
             }
-          })
-          .catch((err) => {
-            cacheObj[url].status = 0;
-            reject(err);
-          });
-      }
-    }
-  });
-}
-function getCacheObj() {
-  return cacheObj;
-}
-function clear(urls) {
-  if (typeof urls === "string") urls = [urls];
-  if (Array.isArray(urls)) {
-    urls.forEach((url) => {
-      if (cacheObj[url]) delete cacheObj[url];
+        }
     });
-  }
 }
-function clearAll() {
-  cacheObj = {};
-  return cacheObj;
+function getCache() {
+    return cacheObj;
 }
-export default {
-  requestCache,
-  clearAll,
-  clear,
-  getCacheObj,
+function getCacheByOids(oids) {
+    if (isNumber(oids) || isString(oids)) return cacheObj[oid];
+    if (Array.isArray(oids)) {
+        return oids.map((oid) => cacheObj[oid]);
+    }
+    console.error('arguments should be a number || string || array')
+}
+function clearCache() {
+    cacheObj = {};
+    return cacheObj;
+}
+function clearCacheByOids(oids) {
+    if (isNumber(oids) || isString(oids)) oids = [oids];
+    if (Array.isArray(oids)) {
+        oids.forEach((oid) => {
+            if (cacheObj[oid]) delete cacheObj[oid];
+        });
+    }
+}
+
+export {
+    requestCache,
+    clearCache,
+    clearCacheByOids,
+    getCache,
+    getCacheByOids
 };
