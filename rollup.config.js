@@ -6,13 +6,5 @@ export default {
       format: "umd",
       name: "requestCacher",
     },
-    {
-      file: "lib/request-cacher.esm.js",
-      format: 'esm'
-    },
-    {
-      file: "lib/request-cacher.cjs.js",
-      format: 'cjs'
-    },
   ],
 };

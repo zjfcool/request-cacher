@@ -27,6 +27,10 @@ function hashCode(str) {
     return hash;
 }
 let cacheObj = {};
+const fromTYpe = {
+    cache: "cache",
+    request: "request"
+}
 function requestCache(request, ...args) {
     return new Promise(async (resolve, reject) => {
         let url = "";
@@ -48,6 +52,7 @@ function requestCache(request, ...args) {
                 oid: oid,
                 options: args,
                 status: 1,
+                from: fromTYpe.cache
             };
         }
         if (cacheObj[oid].status === 1 && cacheObj[oid].data)
@@ -58,11 +63,18 @@ function requestCache(request, ...args) {
                 result
                     .then((res) => {
                         cacheObj[oid].status = 1;
+                        cacheObj[oid].from = fromTYpe.request;
                         if (res.json && isFunction(res.json)) {
-                            res.json().then(data => {
-                                cacheObj[oid].data = data
-                                resolve(cacheObj[oid]);
-                            })
+                            if (res.ok) {
+                                res.json().then(data => {
+                                    cacheObj[oid].data = data
+                                    resolve(cacheObj[oid]);
+                                })
+                            } else {
+                                cacheObj[oid].status = 0;
+                                reject(res)
+                            }
+
                         } else {
                             cacheObj[oid].data = res.data || res;
                             resolve(cacheObj[oid]);
