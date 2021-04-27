@@ -1,6 +1,6 @@
 {
   "name": "request-cacher",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "lib/request-cacher.js",
   "files": [
